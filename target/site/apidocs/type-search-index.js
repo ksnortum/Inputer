@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"net.snortum.inputer","l":"Inputer"},{"p":"net.snortum.inputer","l":"InputerPlay"}]

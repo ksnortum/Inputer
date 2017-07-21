@@ -9,7 +9,7 @@ See `InputerPlay.java` for usage examples.  The basic syntax is:
     Inputer in = new Inputer();
     String name = in.getString("Enter your name");
 
-Inputer will add ": " to a prompt that it thinks needs it.  So the above prompt wold actually be:
+Inputer will add ": " to a prompt that it thinks needs it.  So the above prompt would actually be:
 
     Enter your name:
 
@@ -31,8 +31,8 @@ A specialized version of the above is used to easily a yes/no response.  This ca
 
 A `pom.xml` file has been provided so that the Javadocs can be build using [Maven](https://maven.apache.org/).  Issue the following at the command line:
 
-    mvn site javadoc:javadoc
+    mvn clean javadoc:javadoc
 
-# TODO
+## TODO
 
 * Does not get long, BigInteger, or BigDecimal

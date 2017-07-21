@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * Provides an easy way to prompt for and get data from the console.
  * 
  * @author Knute Snortum
- * @version 2017.07.18
+ * @version 2017.07.21
  */
 public class Inputer {
 	private static final String INT_PROMPT = "Enter an integer: ";
@@ -46,38 +46,38 @@ public class Inputer {
 	/* Helper predicates for input verification */
 	
 	/**
-	 * <p>Takes low and high integers and returns a predicate (lambda) that tests if an entered integer
-	 * is between the two numbers, inclusive.  Used by the client program as an easy way to test for
+	 * <p>Takes low and high integers and returns a predicate that tests if an integer
+	 * is between the low and high, inclusive.  Used by the client program as an easy way to test for
 	 * a range of integers.  For example:</p>
 	 * 
 	 * <p>{@code int age = in.getInt("Enter your age", Inputer.intRange(0, 130));}</p>
 	 * 
-	 * @param low the lower range
-	 * @param high the higher range
+	 * @param low the lower range, inclusive
+	 * @param high the higher range, inclusive
 	 * @return a predicate that tests if an integer is within range
 	 */
 	public static IntPredicate intRange(int low, int high) {
-		return i -> i >= low && i <= high;
+		return i -> i >= low && i <= high; // TODO, test that low is less than high
 	}
 	
 	/**
-	 * <p>Takes low and high doubles and returns a predicate (lambda) that tests if an entered double
-	 * is between the two numbers, inclusive.  Used by the client program as an easy way to test for
+	 * <p>Takes low and high doubles and returns a predicate that tests if a double
+	 * is between low and high, inclusive.  Used by the client program as an easy way to test for
 	 * a range of doubles.  For example:</p>
 	 * 
 	 * <p>{@code double extra = in.getDouble("Enter extra charge", Inputer.doubleRange(1.5, 9.5));}</p>
 	 * 
-	 * @param low the lower range
-	 * @param high the higher range
+	 * @param low the lower range, inclusive
+	 * @param high the higher range, inclusive
 	 * @return a predicate that tests if a double is within range
 	 */
 	public static DoublePredicate doubleRange(double low, double high) {
-		return d -> d >= low && d <= high;
+		return d -> d >= low && d <= high; // TODO, test that low is less than high
 	}
 	
 	/**
-	 * <p>Takes one or more strings and returns a predicate (lambda) that test if an entered string
-	 * matches one of the strings.  Used by the client program to easily test a string against
+	 * <p>Takes one or more strings and returns a predicate that test if a string
+	 * matches any of the passed strings.  Used by the client program to easily test a string against
 	 * a list of valid strings.  For instance:</p>
 	 * 
 	 * <p>{@code String gender = in.getString("Enter gender (m/f/t) ", Inputer.oneOfThese("m", "f", "t"));}</p>
@@ -86,11 +86,12 @@ public class Inputer {
 	 * @return a predicate that tests if a string matches any of the options
 	 */
 	public static Predicate<String> oneOfThese(String... options) {
+		// TODO is one string legal?  Can no strings be passed?
 		return input -> Arrays.stream(options).anyMatch(s -> s.equalsIgnoreCase(input));
 	}
 	
 	/**
-	 * <p>Returns a predicate (lambda) that will test if an entered string starts with "Y", "N", "y", or "n".
+	 * <p>Returns a predicate that will test if a string starts with "Y", "N", "y", or "n".
 	 * Used by the client program to test for a "y/n" response.  For example:</p>
 	 * 
 	 * <p>{@code String agree = in.getString("Do you agree? (y,n) ", Inputer.yesOrNo());}</p>
@@ -154,7 +155,7 @@ public class Inputer {
 	}
 	
 	/**
-	 * Prompts for and gets a string from the console.  A generic prompt is used.  No validation is performed.
+	 * Prompts for and gets a string from the console.  A standard prompt is used.  No validation is performed.
 	 * 
 	 * @return the entered string
 	 * @see #getString(String, Predicate)
@@ -242,8 +243,8 @@ public class Inputer {
 	}
 	
 	/**
-	 * Prompts for a gets an integer from the console.  Must be a valid integer.  No validation
-	 * beyond this is performed.  Uses a generic prompt.
+	 * Prompts for and gets an integer from the console.  Must be a valid integer.  No validation
+	 * beyond this is performed.  Uses a standard prompt.
 	 * 
 	 * @return a valid integer
 	 * @see #getInt(String, IntPredicate)
@@ -309,7 +310,7 @@ public class Inputer {
 	
 	/**
 	 * Prompts for and gets a double from the console.  Must be a valid double.  No further validation
-	 * is done.  Uses a generic message for the prompt.
+	 * is done.  Uses a standard message for the prompt.
 	 * 
 	 * @return a valid double
 	 * @see #getDouble(String, DoublePredicate)
@@ -341,7 +342,7 @@ public class Inputer {
 	
 	/**
 	 * Prompts the user, then waits for the &lt;enter&gt; key to be pressed.  Any input before the
-	 * &lt;enter&gt; key is pressed is ignored.  A generic message is displayed.
+	 * &lt;enter&gt; key is pressed is ignored.  A standard message is displayed.
 	 * 
 	 * @see #pause(String)
 	 */
@@ -351,7 +352,7 @@ public class Inputer {
 	
 	/**
 	 * Prints {@code prompt}, checking whether it needs to add a colon to the end.
-	 * Changes an empty or null prompt to a generic text. 
+	 * Changes an empty or null prompt to a standard text. 
 	 * 
 	 * @param prompt the prompt to display
 	 */

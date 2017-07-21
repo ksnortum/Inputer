@@ -2,6 +2,6 @@
 .project
 .settings
 target/classes
-target/generatd-sources
-target/javadoc-bundle-options
+target/generated-sources
 target/maven-status
+/target/

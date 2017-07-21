@@ -55,9 +55,14 @@ public class Inputer {
 	 * @param low the lower range, inclusive
 	 * @param high the higher range, inclusive
 	 * @return a predicate that tests if an integer is within range
+	 * @throws IllegalArgumentException if low is greater than high
 	 */
 	public static IntPredicate intRange(int low, int high) {
-		return i -> i >= low && i <= high; // TODO, test that low is less than high
+		if (low > high) {
+			throw new IllegalArgumentException("Parameter low must be less than or equal to high");
+		}
+		
+		return i -> i >= low && i <= high; 
 	}
 	
 	/**
@@ -70,9 +75,14 @@ public class Inputer {
 	 * @param low the lower range, inclusive
 	 * @param high the higher range, inclusive
 	 * @return a predicate that tests if a double is within range
+	 * @throws IllegalArgumentException if low is greater than high
 	 */
 	public static DoublePredicate doubleRange(double low, double high) {
-		return d -> d >= low && d <= high; // TODO, test that low is less than high
+		if (low > high) {
+			throw new IllegalArgumentException("Parameter low must be less than or equal to high");
+		}
+		
+		return d -> d >= low && d <= high;
 	}
 	
 	/**
@@ -84,10 +94,14 @@ public class Inputer {
 	 * 
 	 * @param options one or more strings to test for validity against an entered string
 	 * @return a predicate that tests if a string matches any of the options
+	 * @throws IllegalArgumentException if no options are entered
 	 */
 	public static Predicate<String> oneOfThese(String... options) {
-		// TODO is one string legal?  Can no strings be passed?
-		return input -> Arrays.stream(options).anyMatch(s -> s.equalsIgnoreCase(input));
+		if (options.length == 0) {
+			throw new IllegalArgumentException("You must enter at least one option");
+		}
+		
+		return input -> Arrays.stream(options).anyMatch(s -> s.equals(input));
 	}
 	
 	/**

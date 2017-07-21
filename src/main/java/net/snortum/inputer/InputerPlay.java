@@ -4,15 +4,15 @@ package net.snortum.inputer;
  * Provides examples for how to use {@link Inputer}
  * 
  * @author Knute Snortum
- * @version 2017.07.18
+ * @version 2017.07.21
  */
 public class InputerPlay {
 
 	public static void main(String[] args) {
-		new InputerPlay().run();
+		new InputerPlay().examples();
 	}
 	
-	private void run() {
+	private void examples() {
 		Inputer in = new Inputer();
 		String name;
 		int age;
@@ -36,6 +36,15 @@ public class InputerPlay {
 		System.out.printf("Name: %s, Age %d, Number: %d, Gender %s%n", name, age, number, gender);
 		System.out.printf("Extra charge: %1.2f, Total: %,10.2f ", extra, total);
 		System.out.println(agree.charAt(0) == 'y' ? "User agreed" : "User didn't agree");
+	}
+	
+	@SuppressWarnings("unused")
+	private void test() {
+		Inputer in = new Inputer();
+		// String nothing = in.getString("Get nothing? ", Inputer.oneOfThese());
+		// in.getString("Type YES to continue", Inputer.oneOfThese("YES"));
+		// int badRange = in.getInt("Bad range", Inputer.intRange(100, 0));
+		// double badRange = in.getDouble("Bad range", Inputer.doubleRange(100, 0));
 	}
 
 }

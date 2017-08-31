@@ -1,50 +1,106 @@
 package net.snortum.inputer;
 
+import java.util.function.Predicate;
+
 /**
- * Provides examples for how to use {@link Inputer}
+ * Provides examples for how to use {@link Inputer}, or to do testing.
  * 
  * @author Knute Snortum
- * @version 2017.07.21
+ * @version 2017.08.30
  */
 public class InputerPlay {
+	
+	private String[] states = {"WA", "OR", "CA"};
+	private Predicate<String> usaZipValidater = z -> z.matches("\\d{5}(-\\d{4})?");
 
 	public static void main(String[] args) {
-		new InputerPlay().examples();
+		new InputerPlay().run();
 	}
 	
-	private void examples() {
+	private void run() {
+		simpleExample();
+		complexExample();
+		// testErrorConditions();
+	}
+	
+	private void simpleExample() {
 		Inputer in = new Inputer();
-		String name;
-		int age;
-		int number;
-		String gender;
-		double total;
-		double extra;
 		
-		String agree = in.getString("Do you agree? (y,n) ", Inputer.yesOrNo());
+		// Get text
+		String text = in.getString();
+		
+		// Add a prompt
+		String name = in.getString("Enter your name");
+		
+		// Add validation 
+		String zipcode = in.getString("Enter ZIP Code", s -> s.length() <= 10);
+		
+		// Use one of Inputer's built-in validaters
+		int age = in.getInt("Enter your age", Inputer.intRange(0, 130));
+		
+		// Add a default value that is passed back if the user pressed <enter> only
+		int number = in.getInt("Enter the meaning of the universe", d -> d > 0, 42);
+		
+		// Wait for input
 		in.pause();
 		
-		do {
-    		name = in.getString("Enter your name");
-    		age = in.getInt("Enter your age", Inputer.intRange(0, 130));
-    		number = in.getInt("Enter a positive integer", i -> i > 0);
-    		gender = in.getString("Enter gender (m/f/t) ", Inputer.oneOfThese("m", "f", "t"));
-    		total = in.getDouble("Enter a positive amount: ", d -> d > 0);
-    		extra = in.getDouble("Enter extra charge", Inputer.doubleRange(1.5, 9.5));
-		} while (in.getYN("Is this correct?") == 'n');
-		
-		System.out.printf("Name: %s, Age %d, Number: %d, Gender %s%n", name, age, number, gender);
-		System.out.printf("Extra charge: %1.2f, Total: %,10.2f ", extra, total);
-		System.out.println(agree.charAt(0) == 'y' ? "User agreed" : "User didn't agree");
+		System.out.printf("%nText: %s, Name: %s, ZIP: %s%n", text, name, zipcode);
+		System.out.printf("Age: %d, The answer to everything: %d%n", age, number);
 	}
-	
-	@SuppressWarnings("unused")
-	private void test() {
+
+	private void complexExample() {
 		Inputer in = new Inputer();
-		// String nothing = in.getString("Get nothing? ", Inputer.oneOfThese());
-		// in.getString("Type YES to continue", Inputer.oneOfThese("YES"));
-		// int badRange = in.getInt("Bad range", Inputer.intRange(100, 0));
-		// double badRange = in.getDouble("Bad range", Inputer.doubleRange(100, 0));
+		String name = null;
+		String address = null;
+		String address2 = "";
+		String city = null;
+		String state = null;
+		String zipcode = null;
+		
+		System.out.println();
+
+		do {
+			
+			// No validation, first entry cannot be empty, subsequent entry default to last entry.
+			// name is set to null and passed as the default, signifying that an initial entry must be made.
+			name = in.getString("Enter your name", null, name); 
+			address = in.getString("Enter address 1", null, address);
+			
+			// Because address2 is empty (not null), the user is allowed to <enter> past the field
+			address2 = in.getString("Enter address 2", null, address2); 
+			city = in.getString("Enter city", null, city);
+			
+			// Validates against an array of states.
+			// Normally a complete set of US states would be used.
+			state = in.getString("Enter state (west coast only)", Inputer.oneOfThese(states), state);
+			
+			// Uses an external validater, the regex does a better job of validating
+			zipcode = in.getString("Enter ZIP Code", usaZipValidater, zipcode);
+			
+		// Try entering 'n' and <enter> through your old answers
+		} while (in.getYN("Is this correct?") == 'n');
+
+		// Yes/no question that returns a String (not a char) and defaults to "y"
+		String agree = in.getString("Do you agree with out terms and conditions? (y,n)", Inputer.yesOrNo(), "y");
+
+		System.out.println(name);
+		System.out.println(address);
+		
+		if (! address2.isEmpty()) {
+			System.out.println(address2);
+		}
+		
+		System.out.printf("%s, %s  %s%n", city, state, zipcode);
+		System.out.println("y".equalsIgnoreCase(agree) ? "User agreed" : "User didn't agree");
+	}
+
+	@SuppressWarnings("unused")
+	private void testErrorConditions() {
+		Inputer in = new Inputer();
+		String nothing = in.getString("Get nothing? ", Inputer.oneOfThese());
+		in.getString("Type YES to continue", Inputer.oneOfThese("YES"));
+		int badRange = in.getInt("Bad range", Inputer.intRange(100, 0));
+		double badRange2 = in.getDouble("Bad range", Inputer.doubleRange(100, 0));
 	}
 
 }

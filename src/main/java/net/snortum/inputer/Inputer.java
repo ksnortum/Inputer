@@ -1,7 +1,6 @@
 package net.snortum.inputer;
 
 import java.util.Arrays;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
@@ -9,10 +8,10 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
- * Provides an easy way to prompt for and get data from the console.
+ * Provides an easy way to prompt for, get, and validate data from the console.
  * 
  * @author Knute Snortum
- * @version 2017.07.21
+ * @version 2017.08.30
  */
 public class Inputer {
 	private static final String INT_PROMPT = "Enter an integer: ";
@@ -24,7 +23,7 @@ public class Inputer {
 	private static final String CONTINUE_PROMPT = "Press <enter> to continue: ";
 	
 	private static final String STRING_DONT_ADD_COLON = 
-			  "[:)?]" // match one of the char between the brackets
+			  "[:?]"  // match one of the chars between the brackets
 			+ "\\s*"  // match zero or more white space chars
 			+ "$";    // match the end of the string
 	private static final Pattern REGEX_DONT_ADD_COLON = Pattern.compile(STRING_DONT_ADD_COLON);
@@ -42,6 +41,7 @@ public class Inputer {
 			+ "\\s*"
 			+ "$";              // end of string
 	private static final Pattern REGEX_ENDS_WITH_YN = Pattern.compile(STRING_ENDS_WITH_YN, Pattern.CASE_INSENSITIVE);
+	private static final Pattern REGEX_DONT_ADD_OPTIONAL = Pattern.compile("optional", Pattern.CASE_INSENSITIVE);
 	
 	/* Helper predicates for input verification */
 	
@@ -114,69 +114,105 @@ public class Inputer {
 	 * @see #getYN(String)
 	 */
 	public static Predicate<String> yesOrNo() {
-		return input -> "YNyn".chars().anyMatch(c -> input.charAt(0) == c);
+		return input -> "YNyn".chars().anyMatch(c -> (input + " ").charAt(0) == c);
 	}
 	
 	/* Instance members */
 	
 	private final Scanner console = new Scanner(System.in);
-	private boolean lastCallWasGetEmpty = true;
 	
 	/* Get String methods */
 	
 	/**
-	 * Prompts for and gets a string, optionally validated.
+	 * Prompts for and gets a string, optionally validated, with an optional default value
 	 * 
 	 * @param prompt the prompt to print
 	 * @param validater a string predicate to validate the input with.  Can be null.
+	 * @param defalt the default value if &lt;enter&gt; is pressed.  If an empty string is valid, <b>defalt</b>
+	 *               should be empty.  If there is no default, pass <code>null</code>.  Any non-null
+	 *               value is considered valid, regardless of the value of <b>validater</b>.
 	 * @return the entered (and possibly validated) string
+	 * @see #getString(String, Predicate)
 	 * @see #getString(String)
 	 * @see #getString()
 	 * @see #oneOfThese(String...)
 	 * @see #yesOrNo()
 	 * @see #getYN(String)
 	 */
-	public String getString(String prompt, Predicate<String> validater) {
-		lastCallWasGetEmpty = false;
+	public String getString(String prompt, Predicate<String> validater, String defalt) {
 		boolean inputInvalid = false;
 		String result = "";
 		
 		do {
-			printPrompt(prompt);
-			result = console.next();
+			printPrompt(prompt, defalt);
+			result = console.nextLine();
 			
-			if (validater == null || validater.test(result)) {
-				inputInvalid = false;
+			// User pressed <enter> 
+			if (result.isEmpty()) {
+				
+				// Take the default value
+				if (defalt != null) {
+					result = defalt;
+					inputInvalid = false;
+				} else {
+					
+					// Empty string is invalid if default value is null  
+					System.out.println(VALIDATER_FALSE_PROMPT);
+        			inputInvalid = true;
+				}
 			} else {
-				System.out.println(VALIDATER_FALSE_PROMPT);
-    			inputInvalid = true;
+				
+				// Validate
+    			if (validater == null || validater.test(result)) {
+    				inputInvalid = false;
+    			} else {
+    				System.out.println(VALIDATER_FALSE_PROMPT);
+        			inputInvalid = true;
+    			}
 			}
+			
 		} while (inputInvalid);
 		
 		return result;
 	}
 	
 	/**
-	 * Prompts for and gets a string from the console.  No validation is performed.
+	 * Prompts for and gets a string, optionally validated, with no default value
+	 * 
+	 * @param prompt the prompt to print
+	 * @param validater a string predicate to validate the input with.  Can be null.
+	 * @return the entered (and possibly validated) string
+	 * @see #getString(String, Predicate, String)
+	 * @see #getString(String)
+	 * @see #getString()
+	 */
+	public String getString(String prompt, Predicate<String> validater) {
+		return getString(prompt, validater, null);
+	}
+	
+	/**
+	 * Prompts for and gets a string from the console.  No validation is performed.  No default value.
 	 * 
 	 * @param prompt the prompt to print
 	 * @return the entered string
+	 * @see #getString(String, Predicate, String)
 	 * @see #getString(String, Predicate)
 	 * @see #getString()
 	 */
 	public String getString(String prompt) {
-		return getString(prompt, null);
+		return getString(prompt, null, null);
 	}
 	
 	/**
 	 * Prompts for and gets a string from the console.  A standard prompt is used.  No validation is performed.
 	 * 
 	 * @return the entered string
+	 * @see #getString(String, Predicate, String)
 	 * @see #getString(String, Predicate)
 	 * @see #getString(String)
 	 */
 	public String getString() {
-		return getString(STRING_PROMPT, null);
+		return getString(STRING_PROMPT, null, null);
 	}
 	
 	/**
@@ -195,10 +231,10 @@ public class Inputer {
 	 */
 	public char getYN(String prompt) {
 		if (! REGEX_ENDS_WITH_YN.matcher(prompt).find()) {
-			prompt += " (y,n) ";
+			prompt += " (y,n)";
 		}
 		
-		String result = getString(prompt, yesOrNo());
+		String result = getString(prompt, yesOrNo(), null);
 		
 		return result.toLowerCase().charAt(0);
 	}
@@ -207,101 +243,156 @@ public class Inputer {
 	
 	/**
 	 * Prompts for and gets an integer from the console.  Must be a valid integer.  A validater can be 
-	 * entered for further validation.
+	 * entered for further validation.  Allows a default value to be entered.
+	 * 
+	 * @param prompt the prompt to print
+	 * @param validater an integer predicate to validate the input.  Can be null.
+	 * @param defalt the default value if &lt;enter&gt; is pressed.  If there is no default, pass 
+	 *               <code>null</code>.  Any non-null value is considered valid, regardless of the 
+	 *               value of <b>validater</b>.
+	 * @return the entered (and possibly validated) integer
+	 * @see #getInt(String, IntPredicate)
+	 * @see #getInt(String)
+	 * @see #getInt()
+	 * @see #intRange(int, int)
+	 */
+	public int getInt(String prompt, IntPredicate validater, Integer defalt) {
+		boolean inputInvalid = false;
+		int result = 0;
+
+		do {
+			printPrompt(prompt, String.valueOf(defalt));
+			String input = console.nextLine();
+
+			// User pressed <enter>
+			if (input.isEmpty()) {
+
+				// Take the default value
+				if (defalt != null) {
+					result = defalt; 
+					inputInvalid = false;
+				} else {
+
+					// Pressing <enter> is invalid if default value is null
+					System.out.println(VALIDATER_FALSE_PROMPT);
+					inputInvalid = true;
+				}
+			} else {
+				try {
+					result = Integer.parseInt(input);
+
+					// Validate
+					if (validater == null || validater.test(result)) {
+						inputInvalid = false;
+					} else {
+						System.out.println(VALIDATER_FALSE_PROMPT);
+						inputInvalid = true;
+					}
+				} catch (NumberFormatException nfe) {
+					System.out.println(INT_ERROR_PROMPT);
+					inputInvalid = true;
+				}
+			}
+
+		} while (inputInvalid);
+
+		return result;
+	}
+	
+	/**
+	 * Prompts for and gets an integer from the console.  Must be a valid integer.  A validater can be 
+	 * entered for further validation.  No default value.
 	 * 
 	 * @param prompt the prompt to print
 	 * @param validater an integer predicate to validate the input.  Can be null.
 	 * @return the entered (and possibly validated) integer
+	 * @see #getInt(String, IntPredicate, Integer)
 	 * @see #getInt(String)
 	 * @see #getInt()
 	 * @see #intRange(int, int)
 	 */
 	public int getInt(String prompt, IntPredicate validater) {
-		lastCallWasGetEmpty = false;
-		boolean inputInvalid = false;
-		int result = 0;
-		
-		do {
-			printPrompt(prompt);
-			
-    		try {
-    			result = console.nextInt();
-    			
-    			if (validater == null || validater.test(result)) {
-    				inputInvalid = false;
-        		} else {
-        			System.out.println(VALIDATER_FALSE_PROMPT);
-        			inputInvalid = true;
-        		}
-    		} catch (InputMismatchException ime) {
-    			System.out.println(INT_ERROR_PROMPT);
-    			inputInvalid = true;
-    			console.next(); // consume bad token
-    		}
-		} while (inputInvalid);
-		
-		return result;
+		return getInt(prompt, validater, null);
 	}
 
 	/**
 	 * Prompts for and gets an integer from the console.  Must be a valid integer.  No validation
-	 * beyond this is performed.
+	 * beyond this is performed. No default value.
 	 * 
 	 * @param prompt the prompt to print
 	 * @return a valid integer
+	 * @see #getInt(String, IntPredicate, Integer)
 	 * @see #getInt(String, IntPredicate)
 	 * @see #getInt()
 	 */
 	public int getInt(String prompt) {
-		return getInt(prompt, null);
+		return getInt(prompt, null, null);
 	}
 	
 	/**
 	 * Prompts for and gets an integer from the console.  Must be a valid integer.  No validation
-	 * beyond this is performed.  Uses a standard prompt.
+	 * beyond this is performed.  No default value.  Uses a standard prompt.
 	 * 
 	 * @return a valid integer
 	 * @see #getInt(String, IntPredicate)
 	 * @see #getInt(String)
 	 */
 	public int getInt() {
-		return getInt(INT_PROMPT, null);
+		return getInt(INT_PROMPT, null, null);
 	}
 	
 	/* Get double methods */
 	
 	/**
 	 * Prompts for and gets a double from the console.  Must be a valid double.  A validater can be 
-	 * entered for further validation.
+	 * entered for further validation.  Allows for a default value to be entered.
 	 * 
 	 * @param prompt the prompt to print
 	 * @param validater a double predicate to validate the input.  Can be null.
+	 * @param defalt the default value if &lt;enter&gt; is pressed.  If there is no default, pass 
+	 *               <code>null</code>.  Any non-null value is considered valid, regardless of the 
+	 *               value of <b>validater</b>.
 	 * @return the entered (and possibly validated) double
+	 * @see #getDouble(String, DoublePredicate)
 	 * @see #getDouble(String)
 	 * @see #getDouble()
 	 * @see #doubleRange(double, double)
 	 */
-	public double getDouble(String prompt, DoublePredicate validater) {
-		lastCallWasGetEmpty = false;
+	public double getDouble(String prompt, DoublePredicate validater, Double defalt) {
 		boolean inputInvalid = false;
 		double result = 0.0;
 		
 		do {
-			printPrompt(prompt);
+			printPrompt(prompt, null);
+			String input = console.nextLine();
 			
-			try {
-				result = console.nextDouble();
-				
-    			if (validater == null || validater.test(result)) {
-    				inputInvalid = false;
-        		} else {
-        			System.out.println(VALIDATER_FALSE_PROMPT);
+			// User pressed <enter>
+			if (input.isEmpty()) {
+
+				// Take the default value
+				if (defalt != null) {
+					result = defalt; 
+					inputInvalid = false;
+				} else {
+
+					// Pressing <enter> is invalid if default value is null
+					System.out.println(VALIDATER_FALSE_PROMPT);
+					inputInvalid = true;
+				}
+			} else {
+    			try {
+    				result = Double.parseDouble(input);
+    				
+        			if (validater == null || validater.test(result)) {
+        				inputInvalid = false;
+            		} else {
+            			System.out.println(VALIDATER_FALSE_PROMPT);
+            			inputInvalid = true;
+            		}
+    			} catch (NumberFormatException nfe) {
+    				System.out.println(DOUBLE_ERROR_PROMPT);
         			inputInvalid = true;
-        		}
-			} catch (InputMismatchException ime) {
-				System.out.println(DOUBLE_ERROR_PROMPT);
-    			inputInvalid = true;
-    			console.next(); // consume bad token
+    			}
 			}
 			
 		} while (inputInvalid);
@@ -310,8 +401,23 @@ public class Inputer {
 	}
 	
 	/**
+	 * Prompts for and gets a double from the console.  Must be a valid double.  A validater can be 
+	 * entered for further validation.  No default value.
+	 * 
+	 * @param prompt the prompt to print
+	 * @param validater a double predicate to validate the input.  Can be null.
+	 * @return the entered (and possibly validated) double
+	 * @see #getDouble(String, DoublePredicate, Double)
+	 * @see #getDouble(String)
+	 * @see #getDouble()
+	 */
+	public double getDouble(String prompt, DoublePredicate validater) {
+		return getDouble(prompt, validater, null);
+	}
+	
+	/**
 	 * Prompts for and gets a double from the console.  Must be a valid double.  No further validation
-	 * is done.
+	 * is done.  No default value.
 	 * 
 	 * @param prompt the prompt to print
 	 * @return a valid double
@@ -319,19 +425,19 @@ public class Inputer {
 	 * @see #getDouble()
 	 */
 	public double getDouble(String prompt) {
-		return getDouble(prompt, null);
+		return getDouble(prompt, null, null);
 	}
 	
 	/**
 	 * Prompts for and gets a double from the console.  Must be a valid double.  No further validation
-	 * is done.  Uses a standard message for the prompt.
+	 * is done.  No default value.  Uses a standard message for the prompt.
 	 * 
 	 * @return a valid double
 	 * @see #getDouble(String, DoublePredicate)
 	 * @see #getDouble(String)
 	 */
 	public double getDouble() {
-		return getDouble(DOUBLE_PROMPT, null);
+		return getDouble(DOUBLE_PROMPT, null, null);
 	}
 	
 	/* Pause methods */
@@ -344,14 +450,8 @@ public class Inputer {
 	 * @see #pause()
 	 */
 	public void pause(String prompt) {
-		printPrompt(prompt);
-		
-		if (! lastCallWasGetEmpty) {
-			console.nextLine();
-		}
-		
+		printPrompt(prompt, null);
 		console.nextLine();
-		lastCallWasGetEmpty = true;
 	}
 	
 	/**
@@ -369,12 +469,30 @@ public class Inputer {
 	 * Changes an empty or null prompt to a standard text. 
 	 * 
 	 * @param prompt the prompt to display
+	 * @param defalt the default value if &lt;enter&gt; is pressed
 	 */
-	private void printPrompt(String prompt) {
+	private void printPrompt(String prompt, String defalt) {
+		
+		// Assume a "continue" prompt
 		if (prompt == null || prompt.isEmpty()) {
 			prompt = CONTINUE_PROMPT;
-		} else if (! REGEX_DONT_ADD_COLON.matcher(prompt).find() ) {
-			prompt = prompt + ": ";
+		} else {
+			
+			// Add "optional" or default value to the end of the prompt
+			if (defalt != null && ! "null".equals(defalt)) {
+				if (defalt.isEmpty()) {
+					if (! REGEX_DONT_ADD_OPTIONAL.matcher(prompt).find() ) {
+						prompt += " (optional)";
+					}
+				} else {
+					prompt += " [" + defalt + "]";
+				}
+			}
+			
+			// Append a colon if it's not already there
+			if (! REGEX_DONT_ADD_COLON.matcher(prompt).find() ) {
+				prompt += ": ";
+			}
 		}
 		
 		System.out.print(prompt);

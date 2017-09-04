@@ -119,7 +119,7 @@ public class Inputer {
 	
 	/* Instance members */
 	
-	private final Scanner console = new Scanner(System.in);
+	private final Scanner keyboard = new Scanner(System.in);
 	
 	/* Get String methods */
 	
@@ -145,7 +145,7 @@ public class Inputer {
 		
 		do {
 			printPrompt(prompt, defalt);
-			result = console.nextLine();
+			result = keyboard.nextLine();
 			
 			// User pressed <enter> 
 			if (result.isEmpty()) {
@@ -262,7 +262,7 @@ public class Inputer {
 
 		do {
 			printPrompt(prompt, String.valueOf(defalt));
-			String input = console.nextLine();
+			String input = keyboard.nextLine();
 
 			// User pressed <enter>
 			if (input.isEmpty()) {
@@ -364,7 +364,7 @@ public class Inputer {
 		
 		do {
 			printPrompt(prompt, null);
-			String input = console.nextLine();
+			String input = keyboard.nextLine();
 			
 			// User pressed <enter>
 			if (input.isEmpty()) {
@@ -383,6 +383,7 @@ public class Inputer {
     			try {
     				result = Double.parseDouble(input);
     				
+    				// Validate
         			if (validater == null || validater.test(result)) {
         				inputInvalid = false;
             		} else {
@@ -451,7 +452,7 @@ public class Inputer {
 	 */
 	public void pause(String prompt) {
 		printPrompt(prompt, null);
-		console.nextLine();
+		keyboard.nextLine();
 	}
 	
 	/**
@@ -463,6 +464,8 @@ public class Inputer {
 	public void pause() {
 		pause(null);
 	}
+	
+	/* Private methods */
 	
 	/**
 	 * Prints {@code prompt}, checking whether it needs to add a colon to the end.

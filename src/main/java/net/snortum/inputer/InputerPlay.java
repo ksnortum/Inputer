@@ -78,11 +78,12 @@ public class InputerPlay {
 			zipcode = in.getString("Enter ZIP Code", usaZipValidater, zipcode);
 			
 		// Try entering 'n' and <enter> through your old answers
-		} while (in.getYN("Is this correct?") == 'n');
+		} while (in.getYN("Is this information correct?") == 'n');
 
 		// Yes/no question that returns a String (not a char) and defaults to "y"
 		String agree = in.getString("Do you agree with out terms and conditions? (y,n)", Inputer.yesOrNo(), "y");
 
+		System.out.println();
 		System.out.println(name);
 		System.out.println(address);
 		

@@ -8,10 +8,10 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
- * Provides an easy way to prompt for, get, and validate data from the console.
+ * Provides an easy way to prompt for, get, and validate data from the command line.
  * 
  * @author Knute Snortum
- * @version 2017.08.30
+ * @version 2017.10.09
  */
 public class Inputer {
 	private static final String INT_PROMPT = "Enter an integer: ";
@@ -191,7 +191,7 @@ public class Inputer {
 	}
 	
 	/**
-	 * Prompts for and gets a string from the console.  No validation is performed.  No default value.
+	 * Prompts for and gets a string from the keyboard.  No validation is performed.  No default value.
 	 * 
 	 * @param prompt the prompt to print
 	 * @return the entered string
@@ -204,7 +204,7 @@ public class Inputer {
 	}
 	
 	/**
-	 * Prompts for and gets a string from the console.  A standard prompt is used.  No validation is performed.
+	 * Prompts for and gets a string from the keyboard.  A standard prompt is used.  No validation is performed.
 	 * 
 	 * @return the entered string
 	 * @see #getString(String, Predicate, String)
@@ -242,7 +242,7 @@ public class Inputer {
 	/* Get integer methods */
 	
 	/**
-	 * Prompts for and gets an integer from the console.  Must be a valid integer.  A validater can be 
+	 * Prompts for and gets an integer from the keyboard.  Must be a valid integer.  A validater can be 
 	 * entered for further validation.  Allows a default value to be entered.
 	 * 
 	 * @param prompt the prompt to print
@@ -300,7 +300,7 @@ public class Inputer {
 	}
 	
 	/**
-	 * Prompts for and gets an integer from the console.  Must be a valid integer.  A validater can be 
+	 * Prompts for and gets an integer from the keyboard.  Must be a valid integer.  A validater can be 
 	 * entered for further validation.  No default value.
 	 * 
 	 * @param prompt the prompt to print
@@ -316,7 +316,7 @@ public class Inputer {
 	}
 
 	/**
-	 * Prompts for and gets an integer from the console.  Must be a valid integer.  No validation
+	 * Prompts for and gets an integer from the keyboard.  Must be a valid integer.  No validation
 	 * beyond this is performed. No default value.
 	 * 
 	 * @param prompt the prompt to print
@@ -330,7 +330,7 @@ public class Inputer {
 	}
 	
 	/**
-	 * Prompts for and gets an integer from the console.  Must be a valid integer.  No validation
+	 * Prompts for and gets an integer from the keyboard.  Must be a valid integer.  No validation
 	 * beyond this is performed.  No default value.  Uses a standard prompt.
 	 * 
 	 * @return a valid integer
@@ -344,7 +344,7 @@ public class Inputer {
 	/* Get double methods */
 	
 	/**
-	 * Prompts for and gets a double from the console.  Must be a valid double.  A validater can be 
+	 * Prompts for and gets a double from the keyboard.  Must be a valid double.  A validater can be 
 	 * entered for further validation.  Allows for a default value to be entered.
 	 * 
 	 * @param prompt the prompt to print
@@ -402,7 +402,7 @@ public class Inputer {
 	}
 	
 	/**
-	 * Prompts for and gets a double from the console.  Must be a valid double.  A validater can be 
+	 * Prompts for and gets a double from the keyboard.  Must be a valid double.  A validater can be 
 	 * entered for further validation.  No default value.
 	 * 
 	 * @param prompt the prompt to print
@@ -417,7 +417,7 @@ public class Inputer {
 	}
 	
 	/**
-	 * Prompts for and gets a double from the console.  Must be a valid double.  No further validation
+	 * Prompts for and gets a double from the keyboard.  Must be a valid double.  No further validation
 	 * is done.  No default value.
 	 * 
 	 * @param prompt the prompt to print
@@ -430,7 +430,7 @@ public class Inputer {
 	}
 	
 	/**
-	 * Prompts for and gets a double from the console.  Must be a valid double.  No further validation
+	 * Prompts for and gets a double from the keyboard.  Must be a valid double.  No further validation
 	 * is done.  No default value.  Uses a standard message for the prompt.
 	 * 
 	 * @return a valid double

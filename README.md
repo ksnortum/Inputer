@@ -1,6 +1,6 @@
 # Inputer
 
-**Inputer** is a simple, easy-to-use class for prompting for and validating input from the console.
+**Inputer** is a simple, easy-to-use class for prompting for and validating input from the command line.
 
 ## Usage
 

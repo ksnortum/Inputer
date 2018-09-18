@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.snortum.inputer</groupId>
   <artifactId>Inputer</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,7 +35,7 @@
         <configuration>
           <project>
             <description>
-              Inputer: Prompt for and get data from the console
+              Inputer: Prompt for and get data from the keyboard
             </description>
           </project>
           <show>protected</show>

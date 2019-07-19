@@ -11,9 +11,11 @@ import java.util.regex.Pattern;
  * Provides an easy way to prompt for, get, and validate data from the command line.
  * 
  * @author Knute Snortum
- * @version 2017.10.09
+ * @version 2019.07.18
  */
 public class Inputer {
+	private static final Scanner KEYBOARD = new Scanner(System.in);
+	
 	private static final String INT_PROMPT = "Enter an integer: ";
 	private static final String INT_ERROR_PROMPT = "Invalid integer";
 	private static final String STRING_PROMPT = "Enter an string: ";
@@ -43,84 +45,10 @@ public class Inputer {
 	private static final Pattern REGEX_ENDS_WITH_YN = Pattern.compile(STRING_ENDS_WITH_YN, Pattern.CASE_INSENSITIVE);
 	private static final Pattern REGEX_DONT_ADD_OPTIONAL = Pattern.compile("optional", Pattern.CASE_INSENSITIVE);
 	
-	/* Helper predicates for input verification */
-	
-	/**
-	 * <p>Takes low and high integers and returns a predicate that tests if an integer
-	 * is between the low and high, inclusive.  Used by the client program as an easy way to test for
-	 * a range of integers.  For example:</p>
-	 * 
-	 * <p>{@code int age = in.getInt("Enter your age", Inputer.intRange(0, 130));}</p>
-	 * 
-	 * @param low the lower range, inclusive
-	 * @param high the higher range, inclusive
-	 * @return a predicate that tests if an integer is within range
-	 * @throws IllegalArgumentException if low is greater than high
-	 */
-	public static IntPredicate intRange(int low, int high) {
-		if (low > high) {
-			throw new IllegalArgumentException("Parameter low must be less than or equal to high");
-		}
-		
-		return i -> i >= low && i <= high; 
+	/* Do not instantiate */
+	private Inputer() {
 	}
-	
-	/**
-	 * <p>Takes low and high doubles and returns a predicate that tests if a double
-	 * is between low and high, inclusive.  Used by the client program as an easy way to test for
-	 * a range of doubles.  For example:</p>
-	 * 
-	 * <p>{@code double extra = in.getDouble("Enter extra charge", Inputer.doubleRange(1.5, 9.5));}</p>
-	 * 
-	 * @param low the lower range, inclusive
-	 * @param high the higher range, inclusive
-	 * @return a predicate that tests if a double is within range
-	 * @throws IllegalArgumentException if low is greater than high
-	 */
-	public static DoublePredicate doubleRange(double low, double high) {
-		if (low > high) {
-			throw new IllegalArgumentException("Parameter low must be less than or equal to high");
-		}
-		
-		return d -> d >= low && d <= high;
-	}
-	
-	/**
-	 * <p>Takes one or more strings and returns a predicate that test if a string
-	 * matches any of the passed strings.  Used by the client program to easily test a string against
-	 * a list of valid strings.  For instance:</p>
-	 * 
-	 * <p>{@code String gender = in.getString("Enter gender (m/f/t) ", Inputer.oneOfThese("m", "f", "t"));}</p>
-	 * 
-	 * @param options one or more strings to test for validity against an entered string
-	 * @return a predicate that tests if a string matches any of the options
-	 * @throws IllegalArgumentException if no options are entered
-	 */
-	public static Predicate<String> oneOfThese(String... options) {
-		if (options.length == 0) {
-			throw new IllegalArgumentException("You must enter at least one option");
-		}
-		
-		return input -> Arrays.stream(options).anyMatch(s -> s.equals(input));
-	}
-	
-	/**
-	 * <p>Returns a predicate that will test if a string starts with "Y", "N", "y", or "n".
-	 * Used by the client program to test for a "y/n" response.  For example:</p>
-	 * 
-	 * <p>{@code String agree = in.getString("Do you agree? (y,n) ", Inputer.yesOrNo());}</p>
-	 * 
-	 * @return the predicate 
-	 * @see #getYN(String)
-	 */
-	public static Predicate<String> yesOrNo() {
-		return input -> "YNyn".chars().anyMatch(c -> (input + " ").charAt(0) == c);
-	}
-	
-	/* Instance members */
-	
-	private final Scanner keyboard = new Scanner(System.in);
-	
+
 	/* Get String methods */
 	
 	/**
@@ -139,13 +67,13 @@ public class Inputer {
 	 * @see #yesOrNo()
 	 * @see #getYN(String)
 	 */
-	public String getString(String prompt, Predicate<String> validater, String defalt) {
+	public static String getString(String prompt, Predicate<String> validater, String defalt) {
 		boolean inputInvalid = false;
 		String result = "";
 		
 		do {
 			printPrompt(prompt, defalt);
-			result = keyboard.nextLine();
+			result = KEYBOARD.nextLine();
 			
 			// User pressed <enter> 
 			if (result.isEmpty()) {
@@ -186,7 +114,7 @@ public class Inputer {
 	 * @see #getString(String)
 	 * @see #getString()
 	 */
-	public String getString(String prompt, Predicate<String> validater) {
+	public static String getString(String prompt, Predicate<String> validater) {
 		return getString(prompt, validater, null);
 	}
 	
@@ -199,7 +127,7 @@ public class Inputer {
 	 * @see #getString(String, Predicate)
 	 * @see #getString()
 	 */
-	public String getString(String prompt) {
+	public static String getString(String prompt) {
 		return getString(prompt, null, null);
 	}
 	
@@ -211,7 +139,7 @@ public class Inputer {
 	 * @see #getString(String, Predicate)
 	 * @see #getString(String)
 	 */
-	public String getString() {
+	public static String getString() {
 		return getString(STRING_PROMPT, null, null);
 	}
 	
@@ -229,7 +157,7 @@ public class Inputer {
 	 * @param prompt the prompt to print
 	 * @return a 'y' or 'n', depending on the response
 	 */
-	public char getYN(String prompt) {
+	public static char getYN(String prompt) {
 		if (! REGEX_ENDS_WITH_YN.matcher(prompt).find()) {
 			prompt += " (y,n)";
 		}
@@ -256,13 +184,13 @@ public class Inputer {
 	 * @see #getInt()
 	 * @see #intRange(int, int)
 	 */
-	public int getInt(String prompt, IntPredicate validater, Integer defalt) {
+	public static int getInt(String prompt, IntPredicate validater, Integer defalt) {
 		boolean inputInvalid = false;
 		int result = 0;
 
 		do {
 			printPrompt(prompt, String.valueOf(defalt));
-			String input = keyboard.nextLine();
+			String input = KEYBOARD.nextLine();
 
 			// User pressed <enter>
 			if (input.isEmpty()) {
@@ -311,7 +239,7 @@ public class Inputer {
 	 * @see #getInt()
 	 * @see #intRange(int, int)
 	 */
-	public int getInt(String prompt, IntPredicate validater) {
+	public static int getInt(String prompt, IntPredicate validater) {
 		return getInt(prompt, validater, null);
 	}
 
@@ -325,7 +253,7 @@ public class Inputer {
 	 * @see #getInt(String, IntPredicate)
 	 * @see #getInt()
 	 */
-	public int getInt(String prompt) {
+	public static int getInt(String prompt) {
 		return getInt(prompt, null, null);
 	}
 	
@@ -337,7 +265,7 @@ public class Inputer {
 	 * @see #getInt(String, IntPredicate)
 	 * @see #getInt(String)
 	 */
-	public int getInt() {
+	public static int getInt() {
 		return getInt(INT_PROMPT, null, null);
 	}
 	
@@ -358,13 +286,13 @@ public class Inputer {
 	 * @see #getDouble()
 	 * @see #doubleRange(double, double)
 	 */
-	public double getDouble(String prompt, DoublePredicate validater, Double defalt) {
+	public static double getDouble(String prompt, DoublePredicate validater, Double defalt) {
 		boolean inputInvalid = false;
 		double result = 0.0;
 		
 		do {
 			printPrompt(prompt, null);
-			String input = keyboard.nextLine();
+			String input = KEYBOARD.nextLine();
 			
 			// User pressed <enter>
 			if (input.isEmpty()) {
@@ -412,7 +340,7 @@ public class Inputer {
 	 * @see #getDouble(String)
 	 * @see #getDouble()
 	 */
-	public double getDouble(String prompt, DoublePredicate validater) {
+	public static double getDouble(String prompt, DoublePredicate validater) {
 		return getDouble(prompt, validater, null);
 	}
 	
@@ -425,7 +353,7 @@ public class Inputer {
 	 * @see #getDouble(String, DoublePredicate)
 	 * @see #getDouble()
 	 */
-	public double getDouble(String prompt) {
+	public static double getDouble(String prompt) {
 		return getDouble(prompt, null, null);
 	}
 	
@@ -437,7 +365,7 @@ public class Inputer {
 	 * @see #getDouble(String, DoublePredicate)
 	 * @see #getDouble(String)
 	 */
-	public double getDouble() {
+	public static double getDouble() {
 		return getDouble(DOUBLE_PROMPT, null, null);
 	}
 	
@@ -450,9 +378,9 @@ public class Inputer {
 	 * @param prompt the prompt to print
 	 * @see #pause()
 	 */
-	public void pause(String prompt) {
+	public static void pause(String prompt) {
 		printPrompt(prompt, null);
-		keyboard.nextLine();
+		KEYBOARD.nextLine();
 	}
 	
 	/**
@@ -461,7 +389,7 @@ public class Inputer {
 	 * 
 	 * @see #pause(String)
 	 */
-	public void pause() {
+	public static void pause() {
 		pause(null);
 	}
 	
@@ -474,7 +402,7 @@ public class Inputer {
 	 * @param prompt the prompt to display
 	 * @param defalt the default value if &lt;enter&gt; is pressed
 	 */
-	private void printPrompt(String prompt, String defalt) {
+	private static void printPrompt(String prompt, String defalt) {
 		
 		// Assume a "continue" prompt
 		if (prompt == null || prompt.isEmpty()) {
@@ -499,6 +427,80 @@ public class Inputer {
 		}
 		
 		System.out.print(prompt);
+	}
+	
+	/* Helper predicates for input verification */
+	
+	/**
+	 * <p>Takes low and high integers and returns a predicate that tests if an integer
+	 * is between the low and high, inclusive.  Used by the client program as an easy way to test for
+	 * a range of integers.  For example:</p>
+	 * 
+	 * <p>{@code int age = in.getInt("Enter your age", Inputer.intRange(0, 130));}</p>
+	 * 
+	 * @param low the lower range, inclusive
+	 * @param high the higher range, inclusive
+	 * @return a predicate that tests if an integer is within range
+	 * @throws IllegalArgumentException if low is greater than high
+	 */
+	public static IntPredicate intRange(int low, int high) {
+		if (low > high) {
+			throw new IllegalArgumentException("Parameter low must be less than or equal to high");
+		}
+		
+		return i -> i >= low && i <= high; 
+	}
+	
+	/**
+	 * <p>Takes low and high doubles and returns a predicate that tests if a double
+	 * is between low and high, inclusive.  Used by the client program as an easy way to test for
+	 * a range of doubles.  For example:</p>
+	 * 
+	 * <p>{@code double extra = in.getDouble("Enter extra charge", Inputer.doubleRange(1.5, 9.5));}</p>
+	 * 
+	 * @param low the lower range, inclusive
+	 * @param high the higher range, inclusive
+	 * @return a predicate that tests if a double is within range
+	 * @throws IllegalArgumentException if low is greater than high
+	 */
+	public static DoublePredicate doubleRange(double low, double high) {
+		if (low > high) {
+			throw new IllegalArgumentException("Parameter low must be less than or equal to high");
+		}
+		
+		return d -> d >= low && d <= high;
+	}
+	
+	/**
+	 * <p>Takes two or more strings and returns a predicate that test if a string
+	 * matches any of the passed strings.  Used by the client program to easily test a string against
+	 * a list of valid strings.  For instance:</p>
+	 * 
+	 * <p>{@code String gender = in.getString("Enter gender (m/f/t) ", Inputer.oneOfThese("m", "f", "t"));}</p>
+	 * 
+	 * @param options one or more strings to test for validity against an entered string
+	 * @return a predicate that tests if a string matches any of the options
+	 * @throws IllegalArgumentException if less than two options are entered
+	 */
+	public static Predicate<String> oneOfThese(String... options) {
+		if (options.length < 2) {
+			throw new IllegalArgumentException("You must enter at least two options");
+		}
+		
+		return input -> Arrays.stream(options).anyMatch(s -> s.equals(input));
+	}
+	
+	/**
+	 * <p>Returns a predicate that will test if a string starts with "Y", "N", "y", or "n".
+	 * Used by the client program to test for a "y/n" response.  For example:</p>
+	 * 
+	 * <p>{@code String agree = in.getString("Do you agree? (y,n) ", Inputer.yesOrNo());}</p>
+	 * 
+	 * @return the predicate 
+	 * @see #getYN(String)
+	 */
+	public static Predicate<String> yesOrNo() {
+		return input -> "YNyn".chars().anyMatch(c -> (input + " ").charAt(0) == c);
 	}
 
 }

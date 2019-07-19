@@ -6,7 +6,7 @@ import java.util.function.Predicate;
  * Provides examples for how to use {@link Inputer}, or to do testing.
  * 
  * @author Knute Snortum
- * @version 2017.08.30
+ * @version 2019.07.18
  */
 public class InputerPlay {
 	
@@ -20,36 +20,34 @@ public class InputerPlay {
 	private void run() {
 		simpleExample();
 		complexExample();
-		// testErrorConditions();
+		//testErrorConditions();
 	}
 	
 	private void simpleExample() {
-		Inputer in = new Inputer();
-		
+	
 		// Get text
-		String text = in.getString();
+		String text = Inputer.getString();
 		
 		// Add a prompt
-		String name = in.getString("Enter your name");
+		String name = Inputer.getString("Enter your name");
 		
 		// Add validation 
-		String zipcode = in.getString("Enter ZIP Code", s -> s.length() <= 10);
+		String zipcode = Inputer.getString("Enter ZIP Code", s -> s.length() <= 10);
 		
 		// Use one of Inputer's built-in validaters
-		int age = in.getInt("Enter your age", Inputer.intRange(0, 130));
+		int age = Inputer.getInt("Enter your age", Inputer.intRange(0, 130));
 		
 		// Add a default value that is passed back if the user pressed <enter> only
-		int number = in.getInt("Enter the meaning of the universe", d -> d > 0, 42);
+		int number = Inputer.getInt("Enter the meaning of the universe", d -> d > 0, 42);
 		
 		// Wait for input
-		in.pause();
+		Inputer.pause();
 		
 		System.out.printf("%nText: %s, Name: %s, ZIP: %s%n", text, name, zipcode);
 		System.out.printf("Age: %d, The answer to everything: %d%n", age, number);
 	}
 
 	private void complexExample() {
-		Inputer in = new Inputer();
 		String name = null;
 		String address = null;
 		String address2 = "";
@@ -63,25 +61,25 @@ public class InputerPlay {
 			
 			// No validation, first entry cannot be empty, subsequent entry default to last entry.
 			// name is set to null and passed as the default, signifying that an initial entry must be made.
-			name = in.getString("Enter your name", null, name); 
-			address = in.getString("Enter address 1", null, address);
+			name = Inputer.getString("Enter your name", null, name); 
+			address = Inputer.getString("Enter address 1", null, address);
 			
 			// Because address2 is empty (not null), the user is allowed to <enter> past the field
-			address2 = in.getString("Enter address 2", null, address2); 
-			city = in.getString("Enter city", null, city);
+			address2 = Inputer.getString("Enter address 2", null, address2); 
+			city = Inputer.getString("Enter city", null, city);
 			
 			// Validates against an array of states.
 			// Normally a complete set of US states would be used.
-			state = in.getString("Enter state (west coast only)", Inputer.oneOfThese(states), state);
+			state = Inputer.getString("Enter state (west coast only)", Inputer.oneOfThese(states), state);
 			
 			// Uses an external validater, the regex does a better job of validating
-			zipcode = in.getString("Enter ZIP Code", usaZipValidater, zipcode);
+			zipcode = Inputer.getString("Enter ZIP Code", usaZipValidater, zipcode);
 			
 		// Try entering 'n' and <enter> through your old answers
-		} while (in.getYN("Is this information correct?") == 'n');
+		} while (Inputer.getYN("Is this information correct?") == 'n');
 
 		// Yes/no question that returns a String (not a char) and defaults to "y"
-		String agree = in.getString("Do you agree with out terms and conditions? (y,n)", Inputer.yesOrNo(), "y");
+		String agree = Inputer.getString("Do you agree with out terms and conditions? (y,n)", Inputer.yesOrNo(), "y");
 
 		System.out.println();
 		System.out.println(name);
@@ -97,11 +95,12 @@ public class InputerPlay {
 
 	@SuppressWarnings("unused")
 	private void testErrorConditions() {
-		Inputer in = new Inputer();
-		String nothing = in.getString("Get nothing? ", Inputer.oneOfThese());
-		in.getString("Type YES to continue", Inputer.oneOfThese("YES"));
-		int badRange = in.getInt("Bad range", Inputer.intRange(100, 0));
-		double badRange2 = in.getDouble("Bad range", Inputer.doubleRange(100, 0));
+		String nothing = Inputer.getString("Get nothing? ", Inputer.oneOfThese());
+		Inputer.getString("Type YES to continue", Inputer.oneOfThese("YES"));
+		// Use this instead:
+		// Inputer.getString("Type YES to continue", s -> s.equals("YES"));
+		int badRange = Inputer.getInt("Bad range", Inputer.intRange(100, 0));
+		double badRange2 = Inputer.getDouble("Bad range", Inputer.doubleRange(100, 0));
 	}
 
 }

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * Provides an easy way to prompt for, get, and validate data from the command line.
  * 
  * @author Knute Snortum
- * @version 2019.07.18
+ * @version 2019.07.20
  */
 public class Inputer {
 	private static final Scanner KEYBOARD = new Scanner(System.in);
@@ -151,7 +151,7 @@ public class Inputer {
 	 * <pre>
 	 * do {
 	 *     // get data
-	 * } while (in.getYN("Is this correct?") == 'n');
+	 * } while (Inputer.getYN("Is this correct?") == 'n');
 	 * </pre>
 	 * 
 	 * @param prompt the prompt to print
@@ -436,7 +436,7 @@ public class Inputer {
 	 * is between the low and high, inclusive.  Used by the client program as an easy way to test for
 	 * a range of integers.  For example:</p>
 	 * 
-	 * <p>{@code int age = in.getInt("Enter your age", Inputer.intRange(0, 130));}</p>
+	 * <p>{@code int age = Inputer.getInt("Enter your age", Inputer.intRange(0, 130));}</p>
 	 * 
 	 * @param low the lower range, inclusive
 	 * @param high the higher range, inclusive
@@ -456,7 +456,7 @@ public class Inputer {
 	 * is between low and high, inclusive.  Used by the client program as an easy way to test for
 	 * a range of doubles.  For example:</p>
 	 * 
-	 * <p>{@code double extra = in.getDouble("Enter extra charge", Inputer.doubleRange(1.5, 9.5));}</p>
+	 * <p>{@code double extra = Inputer.getDouble("Enter extra charge", Inputer.doubleRange(1.5, 9.5));}</p>
 	 * 
 	 * @param low the lower range, inclusive
 	 * @param high the higher range, inclusive
@@ -476,7 +476,7 @@ public class Inputer {
 	 * matches any of the passed strings.  Used by the client program to easily test a string against
 	 * a list of valid strings.  For instance:</p>
 	 * 
-	 * <p>{@code String gender = in.getString("Enter gender (m/f/t) ", Inputer.oneOfThese("m", "f", "t"));}</p>
+	 * <p>{@code String gender = Inputer.getString("Enter gender (m/f/t) ", Inputer.oneOfThese("m", "f", "t"));}</p>
 	 * 
 	 * @param options one or more strings to test for validity against an entered string
 	 * @return a predicate that tests if a string matches any of the options
@@ -494,7 +494,7 @@ public class Inputer {
 	 * <p>Returns a predicate that will test if a string starts with "Y", "N", "y", or "n".
 	 * Used by the client program to test for a "y/n" response.  For example:</p>
 	 * 
-	 * <p>{@code String agree = in.getString("Do you agree? (y,n) ", Inputer.yesOrNo());}</p>
+	 * <p>{@code String agree = Inputer.getString("Do you agree? (y,n) ", Inputer.yesOrNo());}</p>
 	 * 
 	 * @return the predicate 
 	 * @see #getYN(String)

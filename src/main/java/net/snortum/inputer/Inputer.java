@@ -91,12 +91,12 @@ public class Inputer {
 			} else {
 				
 				// Validate
-    			if (validater == null || validater.test(result)) {
-    				inputInvalid = false;
-    			} else {
-    				System.out.println(VALIDATER_FALSE_PROMPT);
-        			inputInvalid = true;
-    			}
+				if (validater == null || validater.test(result)) {
+					inputInvalid = false;
+				} else {
+					System.out.println(VALIDATER_FALSE_PROMPT);
+					inputInvalid = true;
+				}
 			}
 			
 		} while (inputInvalid);
@@ -308,22 +308,22 @@ public class Inputer {
 					inputInvalid = true;
 				}
 			} else {
-    			try {
-    				result = Double.parseDouble(input);
-    				
-    				// Validate
-        			if (validater == null || validater.test(result)) {
-        				inputInvalid = false;
-            		} else {
-            			System.out.println(VALIDATER_FALSE_PROMPT);
-            			inputInvalid = true;
-            		}
-    			} catch (NumberFormatException nfe) {
-    				System.out.println(DOUBLE_ERROR_PROMPT);
-        			inputInvalid = true;
-    			}
+				try {
+					result = Double.parseDouble(input);
+
+					// Validate
+					if (validater == null || validater.test(result)) {
+						inputInvalid = false;
+					} else {
+						System.out.println(VALIDATER_FALSE_PROMPT);
+						inputInvalid = true;
+					}
+				} catch (NumberFormatException nfe) {
+					System.out.println(DOUBLE_ERROR_PROMPT);
+					inputInvalid = true;
+				}
 			}
-			
+
 		} while (inputInvalid);
 		
 		return result;
@@ -392,43 +392,7 @@ public class Inputer {
 	public static void pause() {
 		pause(null);
 	}
-	
-	/* Private methods */
-	
-	/**
-	 * Prints {@code prompt}, checking whether it needs to add a colon to the end.
-	 * Changes an empty or null prompt to a standard text. 
-	 * 
-	 * @param prompt the prompt to display
-	 * @param defalt the default value if &lt;enter&gt; is pressed
-	 */
-	private static void printPrompt(String prompt, String defalt) {
-		
-		// Assume a "continue" prompt
-		if (prompt == null || prompt.isEmpty()) {
-			prompt = CONTINUE_PROMPT;
-		} else {
-			
-			// Add "optional" or default value to the end of the prompt
-			if (defalt != null && ! "null".equals(defalt)) {
-				if (defalt.isEmpty()) {
-					if (! REGEX_DONT_ADD_OPTIONAL.matcher(prompt).find() ) {
-						prompt += " (optional)";
-					}
-				} else {
-					prompt += " [" + defalt + "]";
-				}
-			}
-			
-			// Append a colon if it's not already there
-			if (! REGEX_DONT_ADD_COLON.matcher(prompt).find() ) {
-				prompt += ": ";
-			}
-		}
-		
-		System.out.print(prompt);
-	}
-	
+
 	/* Helper predicates for input verification */
 	
 	/**
@@ -502,5 +466,41 @@ public class Inputer {
 	public static Predicate<String> yesOrNo() {
 		return input -> "YNyn".chars().anyMatch(c -> (input + " ").charAt(0) == c);
 	}
-
+	
+	/* Private methods */
+	
+	/**
+	 * Prints {@code prompt}, checking whether it needs to add a colon to the end.
+	 * Changes an empty or null prompt to a standard text. 
+	 * 
+	 * @param prompt the prompt to display
+	 * @param defalt the default value if &lt;enter&gt; is pressed
+	 */
+	private static void printPrompt(String prompt, String defalt) {
+		
+		// Assume a "continue" prompt
+		if (prompt == null || prompt.isEmpty()) {
+			prompt = CONTINUE_PROMPT;
+		} else {
+			
+			// Add "optional" or default value to the end of the prompt
+			if (defalt != null && ! "null".equals(defalt)) {
+				if (defalt.isEmpty()) {
+					if (! REGEX_DONT_ADD_OPTIONAL.matcher(prompt).find() ) {
+						prompt += " (optional)";
+					}
+				} else {
+					prompt += " [" + defalt + "]";
+				}
+			}
+			
+			// Append a colon if it's not already there
+			if (! REGEX_DONT_ADD_COLON.matcher(prompt).find() ) {
+				prompt += ": ";
+			}
+		}
+		
+		System.out.print(prompt);
+	}
+	
 }

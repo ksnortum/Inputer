@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -11,13 +12,15 @@ import java.util.regex.Pattern;
  * Provides an easy way to prompt for, get, and validate data from the command line.
  *
  * @author Knute Snortum
- * @version 2019.07.20
+ * @version 2020.03.29
  */
 public class Inputer {
 	private static final Scanner KEYBOARD = new Scanner(System.in);
 
 	private static final String INT_PROMPT = "Enter an integer: ";
 	private static final String INT_ERROR_PROMPT = "Invalid integer";
+	private static final String LONG_PROMPT = "Enter a long: ";
+	private static final String LONG_ERROR_PROMPT = "Invalid long";
 	private static final String STRING_PROMPT = "Enter an string: ";
 	private static final String DOUBLE_PROMPT = "Enter a double (decimal): ";
 	private static final String DOUBLE_ERROR_PROMPT = "Invalid double (decimal)";
@@ -262,6 +265,7 @@ public class Inputer {
 	 * beyond this is performed.  No default value.  Uses a standard prompt.
 	 *
 	 * @return a valid integer
+	 * @see #getInt(String, IntPredicate, Integer)
 	 * @see #getInt(String, IntPredicate)
 	 * @see #getInt(String)
 	 */
@@ -269,6 +273,109 @@ public class Inputer {
 		return getInt(INT_PROMPT, null, null);
 	}
 
+	/* Get long methods */
+
+	/**
+	 * Prompts for and gets a long from the keyboard.  Must be a valid long.  A validater can be
+	 * entered for further validation.  Allows a default value to be entered.
+	 *
+	 * @param prompt the prompt to print
+	 * @param validater a long predicate to validate the input.  Can be null.
+	 * @param defalt the default value if &lt;enter&gt; is pressed.  If there is no default, pass
+	 *               <code>null</code>.  Any non-null value is considered valid, regardless of the
+	 *               value of <b>validater</b>.
+	 * @return the entered (and possibly validated) long
+	 * @see #getLong(String, LongPredicate)
+	 * @see #getLong(String)
+	 * @see #getLong()
+	 * @see #longRange(long, long)
+	 */
+	public static long getLong(String prompt, LongPredicate validater, Long defalt) {
+		boolean inputInvalid = false;
+		long result = 0;
+
+		do {
+			printPrompt(prompt, String.valueOf(defalt));
+			String input = KEYBOARD.nextLine();
+
+			// User pressed <enter>
+			if (input.isEmpty()) {
+
+				// Take the default value
+				if (defalt != null) {
+					result = defalt;
+					inputInvalid = false;
+				} else {
+
+					// Pressing <enter> is invalid if default value is null
+					System.out.println(VALIDATER_FALSE_PROMPT);
+					inputInvalid = true;
+				}
+			} else {
+				try {
+					result = Long.parseLong(input);
+
+					// Validate
+					if (validater == null || validater.test(result)) {
+						inputInvalid = false;
+					} else {
+						System.out.println(VALIDATER_FALSE_PROMPT);
+						inputInvalid = true;
+					}
+				} catch (NumberFormatException nfe) {
+					System.out.println(LONG_ERROR_PROMPT);
+					inputInvalid = true;
+				}
+			}
+
+		} while (inputInvalid);
+
+		return result;
+	}
+
+	/**
+	 * Prompts for and gets a long from the keyboard.  Must be a valid long.  A validater can be
+	 * entered for further validation.  No default value.
+	 *
+	 * @param prompt the prompt to print
+	 * @param validater a long predicate to validate the input.  Can be null.
+	 * @return the entered (and possibly validated) long
+	 * @see #getLong(String, LongPredicate, Long)
+	 * @see #getLong(String)
+	 * @see #getLong()
+	 * @see #longRange(long, long)
+	 */
+	public static long getLong(String prompt, LongPredicate validater) {
+		return getLong(prompt, validater, null);
+	}
+
+	/**
+	 * Prompts for and gets a long from the keyboard.  Must be a valid long.  No validation
+	 * beyond this is performed.  No default value.
+	 *
+	 * @param prompt the prompt to print
+	 * @return a valid long
+	 * @see #getLong(String, LongPredicate, Long)
+	 * @see #getLong(String, LongPredicate)
+	 * @see #getLong()
+	 */
+	public static long getLong(String prompt) {
+		return getLong(prompt, null, null);
+	}
+
+	/**
+	 * Prompts for and gets a long from the keyboard.  Must be a valid long.  No validation
+	 * beyond this is performed.  No default value.  Uses a standard prompt.
+	 *
+	 * @return a valid long
+	 * @see #getLong(String, LongPredicate, Long)
+	 * @see #getLong(String, LongPredicate)
+	 * @see #getLong(String)
+	 */
+	public static long getLong() {
+		return getLong(LONG_PROMPT, null, null);
+	}
+	
 	/* Get double methods */
 
 	/**
@@ -350,6 +457,7 @@ public class Inputer {
 	 *
 	 * @param prompt the prompt to print
 	 * @return a valid double
+	 * @see #getDouble(String, DoublePredicate, Double)
 	 * @see #getDouble(String, DoublePredicate)
 	 * @see #getDouble()
 	 */
@@ -362,6 +470,7 @@ public class Inputer {
 	 * is done.  No default value.  Uses a standard message for the prompt.
 	 *
 	 * @return a valid double
+	 * @see #getDouble(String, DoublePredicate, Double)
 	 * @see #getDouble(String, DoublePredicate)
 	 * @see #getDouble(String)
 	 */
@@ -413,6 +522,26 @@ public class Inputer {
 		}
 
 		return i -> i >= low && i <= high;
+	}
+	
+	/**
+	 * <p>Takes low and high longs and returns a predicate that tests if a long
+	 * is between the low and high, inclusive.  Used by the client program as an easy way to test for
+	 * a range of longs.  For example:</p>
+	 *
+	 * <p>{@code long num = Inputer.getLong("Enter number of stars", Inputer.longRange(0, 9999999999L));}</p>
+	 *
+	 * @param low the lower range, inclusive
+	 * @param high the higher range, inclusive
+	 * @return a predicate that tests if a long is within range
+	 * @throws IllegalArgumentException if low is greater than high
+	 */
+	public static LongPredicate longRange(long low, long high) {
+		if (low > high) {
+			throw new IllegalArgumentException("Parameter low must be less than or equal to high");
+		}
+
+		return l -> l >= low && l <= high;
 	}
 
 	/**

@@ -40,11 +40,15 @@ public class InputerPlay {
 		// Add a default value that is passed back if the user pressed <enter> only
 		int number = Inputer.getInt("Enter the meaning of the universe", d -> d > 0, 42);
 		
+		// Use long methods for big numbers
+		long stars = Inputer.getLong("Enter the number of stars", Inputer.longRange(0, 9999999999L));
+		
 		// Wait for input
 		Inputer.pause();
 		
 		System.out.printf("%nText: %s, Name: %s, ZIP: %s%n", text, name, zipcode);
 		System.out.printf("Age: %d, The answer to everything: %d%n", age, number);
+		System.out.printf("The number of stars in the universe: %d%n", stars);
 	}
 
 	private void complexExample() {

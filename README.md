@@ -26,13 +26,7 @@ A specialized version of the above is used to easily a yes/no response.  This ca
         // Get data here
     } while (Inputer.getYN("Is this correct?") == 'n');
 
-## Javadoc
-
-A `pom.xml` file has been provided so that the Javadocs can be build using [Maven](https://maven.apache.org/).  Issue the following at the command line:
-
-    mvn clean javadoc:javadoc
-
 ## TODO
 
 * Make class more DRY
-* Does not get long, BigInteger, or BigDecimal
+* Does not work with BigInteger or BigDecimal

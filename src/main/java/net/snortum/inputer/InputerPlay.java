@@ -10,8 +10,8 @@ import java.util.function.Predicate;
  */
 public class InputerPlay {
 	
-	private String[] states = {"WA", "OR", "CA"};
-	private Predicate<String> usaZipValidater = z -> z.matches("\\d{5}(-\\d{4})?");
+	private final String[] states = {"WA", "OR", "CA"};
+	private final Predicate<String> usaZipValidater = z -> z.matches("\\d{5}(-\\d{4})?");
 
 	public static void main(String[] args) {
 		new InputerPlay().run();
